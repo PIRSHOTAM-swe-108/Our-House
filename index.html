@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Home - Bachelor Pad Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Profile Settings</h2>
+                <button id="close-profile-modal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-section">
+                    <h3>Avatar</h3>
+                    <div class="avatar-picker">
+                        <div id="user-avatar" class="avatar-display"><i class="fas fa-user-circle fa-5x"></i></div>
+                        <div class="avatar-colors">
+                            <button class="avatar-btn" data-color="#3B82F6" style="background: #3B82F6;"></button>
+                            <button class="avatar-btn" data-color="#10B981" style="background: #10B981;"></button>
+                            <button class="avatar-btn" data-color="#8B5CF6" style="background: #8B5CF6;"></button>
+                            <button class="avatar-btn" data-color="#F59E0B" style="background: #F59E0B;"></button>
+                            <button class="avatar-btn" data-color="#EC4899" style="background: #EC4899;"></button>
+                            <button class="avatar-btn" data-color="#6366F1" style="background: #6366F1;"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <h3>Account Info</h3>
+                    <p><strong>Username:</strong> <span id="profile-username"></span></p>
+                    <p><strong>Member Since:</strong> <span id="profile-joined"></span></p>
+                    <p><strong>Total Activities:</strong> <span id="profile-activities"></span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="save-profile-btn" style="width: 100%;">Save Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="auth-section" class="auth-container">
+        <!-- Floating decorative shapes -->
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        
+        <div class="auth-box fade-in-up">
+            <div class="auth-header">
+                <div class="auth-logo"><i class="fas fa-home"></i></div>
+                <h2>Our Home</h2>
+                <p id="auth-subtitle">Log in to manage your pad</p>
+            </div>
+            
+            <form id="auth-form">
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="auth-username" required placeholder="Username">
+                </div>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="auth-password" required placeholder="Password">
+                </div>
+                <div id="password-strength-info"></div>
+                
+                <button type="submit" class="btn-primary auth-btn" id="auth-submit-btn">
+                    <span>Access Application</span> <i class="fas fa-arrow-right"></i>
+                </button>
+                
+                <p class="auth-switch">New roommate? <a href="#" id="switch-auth">Create an account</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app-section" class="hidden">
+        <nav class="navbar">
+            <div class="nav-brand"><i class="fas fa-home"></i> Our Home</div>
+            <div class="nav-links">
+                <button class="nav-btn active" data-target="home-section"><i class="fas fa-th-large"></i> Dashboard</button>
+                <button class="nav-btn" data-target="expenses-section"><i class="fas fa-wallet"></i> Expenses</button>
+                <button class="nav-btn" data-target="shared-expenses-section"><i class="fas fa-receipt"></i> Shared Bill</button>
+                <button class="nav-btn" data-target="payment-section"><i class="fas fa-money-bill-wave"></i> Payments</button>
+                <button class="nav-btn" data-target="chores-section"><i class="fas fa-broom"></i> Chores</button>
+                <button class="nav-btn" data-target="chat-section"><i class="fas fa-comments"></i> Chat</button>
+                <button class="nav-btn" data-target="reports-section"><i class="fas fa-chart-bar"></i> Reports</button>
+                <button class="nav-btn" data-target="activity-section"><i class="fas fa-history"></i> Activity</button>
+            </div>
+            <div class="user-profile">
+                <span id="current-user-display" class="user-display"><i class="fas fa-user-circle"></i> User</span>
+                <button id="profile-btn" class="btn-outline" title="Profile Settings" style="padding: 0.4rem 0.8rem;"><i class="fas fa-cog"></i></button>
+                <button id="theme-toggle-btn" class="btn-outline" title="Toggle Dark Mode" style="padding: 0.4rem 0.8rem; border-radius: 50%;"><i class="fas fa-moon"></i></button>
+                <button id="logout-btn" class="btn-outline" title="Logout" style="padding: 0.4rem 0.8rem; border-radius: 50%;"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </nav>
+
+        <main class="container">
+            <!-- Home / Landing Section -->
+            <section id="home-section" class="page-section active">
+                <div class="hero">
+                    <h1 id="welcome-message">Welcome to Our Home!</h1>
+                    <p>Here is your household overview at a glance.</p>
+                </div>
+                <div class="dashboard-cards">
+                    <div class="card bg-blue">
+                        <div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <h3>Total House Expenses</h3>
+                        <h2 id="dash-expenses">Rs 0</h2>
+                        <button class="btn-outline" onclick="navigateTo('expenses-section')">View Ledger</button>
+                    </div>
+                    <div class="card bg-green">
+                        <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <h3>Your Pending Chores</h3>
+                        <h2 id="dash-chores">0</h2>
+                        <button class="btn-outline" onclick="navigateTo('chores-section')">Check Roster</button>
+                    </div>
+                    <div class="card bg-purple">
+                        <div class="card-icon"><i class="fas fa-comment-dots"></i></div>
+                        <h3>House Messages</h3>
+                        <h2 id="dash-messages">0</h2>
+                        <button class="btn-outline" onclick="navigateTo('chat-section')">Open Board</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Expenses Section -->
+            <section id="expenses-section" class="page-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-file-invoice-dollar"></i> Expense Ledger</h2>
+                    <p>Track purchases. Transparent accounting for everyone.</p>
+                </div>
+                
+                <div class="split-layout">
+                    <div class="form-panel">
+                        <h3><i class="fas fa-plus-circle"></i> Add New Expense</h3>
+                        <form id="expense-form">
+                            <div class="form-group">
+                                <label>What did you buy?</label>
+                                <input type="text" id="expense-item" required placeholder="e.g., Groceries, Wi-Fi Bill">
+                            </div>
+                            <div class="form-group">
+                                <label>Price (Rs)</label>
+                                <input type="number" id="expense-price" required min="0" step="0.01" placeholder="0.00">
+                            </div>
+                            <button type="submit" class="btn-primary">Add Expense</button>
+                        </form>
+                        <div class="settle-up-box">
+                            <h4><i class="fas fa-handshake"></i> Settle Up</h4>
+                            <p>Clear all records if everyone has paid their share for the month.</p>
+                            <button id="settle-up-btn" class="btn-danger">Clear All Expenses</button>
+                        </div>
+                        <div class="backup-box">
+                            <h4><i class="fas fa-download"></i> Backup Data</h4>
+                            <p>Download all your data as a JSON file for safekeeping.</p>
+                            <button id="backup-btn" class="btn-outline" style="width: 100%; color: var(--primary);">Export All Data</button>
+                        </div>
+                    </div>
+                    <div class="data-panel">
+                        <h3><i class="fas fa-chart-pie"></i> Partner Summaries</h3>
+                        <div id="expense-summaries" class="expense-grid">
+                            <!-- Dynamically populated -->
+                        </div>
+                        <div id="settlement-summary" style="margin-top: 2rem;"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chores Section -->
+            <section id="chores-section" class="page-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-clipboard-list"></i> Duty Chart & Chores</h2>
+                    <p>Distributed work schedule. Know exactly who is doing what and when.</p>
+                </div>
+
+                <div class="split-layout">
+                    <div class="form-panel">
+                        <h3><i class="fas fa-tasks"></i> Assign a Chore</h3>
+                        <form id="chore-form">
+                            <div class="form-group">
+                                <label>Assign To (Roommate)</label>
+                                <input type="text" id="chore-partner" required placeholder="e.g., Mike">
+                            </div>
+                            <div class="form-group">
+                                <label>Chore Description</label>
+                                <input type="text" id="chore-desc" required placeholder="e.g., Cooking rice at lunch time">
+                            </div>
+                            <div class="form-group">
+                                <label>Time/Frequency</label>
+                                <select id="chore-time">
+                                    <option value="Morning">Morning</option>
+                                    <option value="Lunch">Lunch Time</option>
+                                    <option value="Evening">Evening</option>
+                                    <option value="Night">Night (Dinner)</option>
+                                    <option value="Twice a Day">Twice a Day</option>
+                                    <option value="Custom">Custom / Other</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary">Add to Roster</button>
+                        </form>
+                    </div>
+                    <div class="data-panel">
+                        <h3><i class="fas fa-list-ul"></i> Current Roster</h3>
+                        <div class="table-responsive">
+                            <table class="roster-table">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Time</th>
+                                        <th>Task</th>
+                                        <th>Assignee</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="chore-list">
+                                    <!-- Dynamically populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat / Communication Section -->
+            <section id="chat-section" class="page-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-comments"></i> Roomie Comm Board</h2>
+                    <p>Leave notices, reminders, or just chat with the housemates.</p>
+                </div>
+
+                <div class="chat-container premium-chat">
+                    <div class="chat-messages premium-messages" id="chat-messages">
+                        <!-- Dynamically populated -->
+                    </div>
+                    
+                    <!-- File Preview Section -->
+                    <div id="chat-file-preview" class="chat-file-preview hidden">
+                        <div class="preview-item">
+                            <img id="preview-image" style="max-width: 150px; max-height: 100px; border-radius: 0.5rem;">
+                            <div class="preview-info">
+                                <span id="preview-filename"></span>
+                                <button type="button" class="btn-remove-preview" onclick="removeChatFilePreview()">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form id="chat-form" class="chat-input-area premium-chat-form">
+                        <div class="chat-input-wrapper">
+                            <div class="chat-input-group">
+                                <!-- File Upload Input (Hidden) -->
+                                <input type="file" id="chat-file-input" accept="image/*,.pdf,.doc,.docx" style="display: none;">
+                                
+                                <!-- Media Buttons -->
+                                <button type="button" class="chat-media-btn" title="Upload File" onclick="document.getElementById('chat-file-input').click()">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                
+                                <button type="button" class="chat-media-btn" title="Open Camera" onclick="openChatCamera()">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                                
+                                <button type="button" class="chat-media-btn" title="Open Gallery" onclick="openChatGallery()">
+                                    <i class="fas fa-image"></i>
+                                </button>
+                                
+                                <!-- Message Input -->
+                                <input type="text" id="chat-text" placeholder="Type a message..." class="msg-input premium-msg-input" autocomplete="off">
+                                
+                                <!-- Send Button -->
+                                <button type="submit" class="chat-send-btn">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Activity Log Section -->
+            <section id="activity-section" class="page-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-history"></i> Activity History</h2>
+                    <p>View all actions and changes in your household.</p>
+                </div>
+
+                <div class="data-panel" style="max-width: 100%;">
+                    <h3><i class="fas fa-list-ul"></i> Recent Activities</h3>
+                    <div id="activity-list" class="activity-list">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports-section" class="page-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> Monthly Reports</h2>
+                    <p>Analyze spending trends and expense breakdowns.</p>
+                </div>
+
+                <div class="split-layout">
+                    <div class="data-panel">
+                        <h3><i class="fas fa-filter"></i> Select Month</h3>
+                        <form id="report-filter-form">
+                            <div class="form-group">
+                                <label>Month & Year</label>
+                                <input type="month" id="report-month" required>
+                            </div>
+                            <button type="submit" class="btn-primary">Generate Report</button>
+                        </form>
+                    </div>
+                    <div class="data-panel">
+                        <h3><i class="fas fa-chart-pie"></i> Expense Summary</h3>
+                        <div id="report-summary" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                            Select a month to view report
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-panel" style="margin-top: 2rem;">
+                    <h3><i class="fas fa-list"></i> Monthly Breakdown</h3>
+                    <div id="report-breakdown" class="expense-grid">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Shared Expenses Section (NEW) -->
+            <section id="shared-expenses-section" class="page-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-receipt"></i> Shared Expenses & Billing</h2>
+                    <p>Manage household expenses, track individual spending, and settle bills fairly.</p>
+                </div>
+
+                <!-- Add Shared Expense Form -->
+                <div class="split-layout">
+                    <div class="form-panel">
+                        <h3><i class="fas fa-plus-circle"></i> Add Shared Expense</h3>
+                        <form id="shared-expense-form">
+                            <div class="form-group">
+                                <label>Item/Description *</label>
+                                <input type="text" id="shared-item" required placeholder="e.g., Groceries, Rent, Utilities">
+                            </div>
+                            <div class="form-group">
+                                <label>Amount (Rs) *</label>
+                                <input type="number" id="shared-amount" required min="0" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="shared-category">
+                                    <option value="Groceries">🛒 Groceries</option>
+                                    <option value="Utilities">⚡ Utilities (Water/Gas)</option>
+                                    <option value="Rent">🏠 Rent</option>
+                                    <option value="Internet">📡 Internet</option>
+                                    <option value="Maintenance">🔧 Maintenance</option>
+                                    <option value="Cleaning">🧹 Cleaning Supplies</option>
+                                    <option value="Food">🍜 Food/Dining</option>
+                                    <option value="Other">📝 Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Notes/Explanation</label>
+                                <textarea id="shared-notes" placeholder="Describe what you bought and why..." rows="3" maxlength="200"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Receipt/Image (Optional)</label>
+                                <input type="file" id="shared-receipt" accept="image/*" onchange="previewReceipt(this)">
+                                <div id="receipt-preview" style="margin-top: 0.5rem; display: none;">
+                                    <img id="receipt-img" style="max-width: 100%; max-height: 150px; border-radius: 0.5rem;">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">Add to Shared Expenses</button>
+                        </form>
+                    </div>
+
+                    <!-- Billing Summary & Settlement -->
+                    <div class="data-panel">
+                        <h3><i class="fas fa-calculator"></i> Monthly Settlement</h3>
+                        <div id="billing-summary" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+                            <p>Add expenses to see settlement details</p>
+                        </div>
+                        <div id="settlement-cards" style="margin-top: 1rem;"></div>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                            <button class="btn-primary" style="width: 100%; margin-bottom: 0.5rem;" onclick="downloadMonthlyBill()">
+                                <i class="fas fa-download"></i> Download Monthly Bill
+                            </button>
+                            <button class="btn-outline" style="width: 100%;" onclick="navigateTo('payment-section')">
+                                <i class="fas fa-money-bill-wave"></i> Pay Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Members Expenses Table -->
+                <div class="data-panel" style="margin-top: 2rem;">
+                    <h3><i class="fas fa-list-ul"></i> All Shared Expenses</h3>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <input type="text" id="expense-filter" placeholder="Search expenses..." style="flex: 1; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                        <select id="category-filter" style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                            <option value="">All Categories</option>
+                            <option value="Groceries">🛒 Groceries</option>
+                            <option value="Utilities">⚡ Utilities</option>
+                            <option value="Rent">🏠 Rent</option>
+                            <option value="Internet">📡 Internet</option>
+                            <option value="Maintenance">🔧 Maintenance</option>
+                            <option value="Cleaning">🧹 Cleaning</option>
+                            <option value="Food">🍜 Food/Dining</option>
+                            <option value="Other">📝 Other</option>
+                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="roster-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Item</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Added By</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shared-expenses-list">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Individual Statistics -->
+                <div class="data-panel" style="margin-top: 2rem;">
+                    <h3><i class="fas fa-chart-pie"></i> Member Statistics</h3>
+                    <div id="member-stats" class="member-stats-grid">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payment Section (NEW) -->
+            <section id="payment-section" class="page-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-money-bill-wave"></i> Payments & Settlements</h2>
+                    <p>Pay your share or receive payments from roommates.</p>
+                </div>
+
+                <div class="split-layout">
+                    <!-- Payment Summary -->
+                    <div class="data-panel">
+                        <h3><i class="fas fa-receipt"></i> Your Balance</h3>
+                        <div id="payment-summary" style="text-align: center; padding: 2rem;">
+                            <div id="your-balance" style="font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem;">Rs 0.00</div>
+                            <div id="balance-status" style="color: var(--text-muted);">No pending balance</div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="data-panel">
+                        <h3><i class="fas fa-credit-card"></i> Payment Methods</h3>
+                        <div class="payment-methods">
+                            <button class="payment-method-btn" onclick="selectPaymentMethod('easypaisa')">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>EasyPaisa</span>
+                            </button>
+                            <button class="payment-method-btn" onclick="selectPaymentMethod('bank')">
+                                <i class="fas fa-university"></i>
+                                <span>Bank Transfer</span>
+                            </button>
+                            <button class="payment-method-btn" onclick="selectPaymentMethod('jazz')">
+                                <i class="fas fa-phone"></i>
+                                <span>JazzCash</span>
+                            </button>
+                            <button class="payment-method-btn" onclick="selectPaymentMethod('cash')">
+                                <i class="fas fa-coins"></i>
+                                <span>Cash</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Details Form -->
+                <div class="data-panel" style="margin-top: 2rem;">
+                    <h3 id="payment-method-title">Select Payment Method</h3>
+                    <form id="payment-form" style="display: none;">
+                        <div id="payment-fields"></div>
+                        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                            <button type="button" class="btn-outline" style="flex: 1;" onclick="cancelPayment()">Cancel</button>
+                            <button type="submit" class="btn-primary" style="flex: 1;">Confirm Payment</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Payment History -->
+                <div class="data-panel" style="margin-top: 2rem;">
+                    <h3><i class="fas fa-history"></i> Payment History</h3>
+                    <div id="payment-history" style="color: var(--text-muted); text-align: center; padding: 2rem;">
+                        No payment history yet
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
